@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Download, Settings, LogOut } from "lucide-react"
-import { generatePDF } from "@/lib/pdf-generator"
+import { generatePDF, generatePriceListPDF } from "@/lib/pdf-generator"
 
 const CORE_DATA = {
   "7236": { RB: 11.12, PU: 9.8, EP: 5.58, LTX: 52.76, MMRY: 38.91, SS: 11.65 },
@@ -405,16 +405,7 @@ export default function Home() {
       }
     }
 
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: "Jeza_Mattresses_Price_List.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { orientation: "landscape", unit: "mm", format: "a4" },
-    }
-
-    const html2pdf = (await import("html2pdf.js")).default
-    html2pdf().set(opt).from(element).save()
+    await generatePriceListPDF(element, "Jeza_Mattresses_Price_List.pdf")
     setShowPriceListGenerator(false)
   }
 
@@ -436,62 +427,68 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-slate-50">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image src="/images/logo.png" alt="Jeza Mattresses" width={200} height={70} className="h-14 w-auto" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-3 md:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 shrink-0">
+            <Image src="/images/logo.png" alt="Jeza Mattresses" width={200} height={70} className="h-10 sm:h-14 w-auto" />
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-end">
             <Button
               onClick={() => setShowRates(!showRates)}
               variant="outline"
-              className="text-slate-700 border-slate-300 hover:bg-slate-100"
+              size="sm"
+              className="text-slate-700 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-3"
             >
-              View Rates
+              <span className="hidden sm:inline">View Rates</span>
+              <span className="sm:hidden">Rates</span>
             </Button>
             <Button
               onClick={() => setShowRateEditor("materials")}
               variant="outline"
-              className="text-slate-700 border-slate-300 hover:bg-slate-100"
+              size="sm"
+              className="text-slate-700 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-3"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              Material Rates
+              <Settings className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Material Rates</span>
             </Button>
             <Button
               onClick={() => setShowRateEditor("fabrics")}
               variant="outline"
-              className="text-slate-700 border-slate-300 hover:bg-slate-100"
+              size="sm"
+              className="text-slate-700 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-3"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              Fabric Rates
+              <Settings className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Fabric Rates</span>
             </Button>
             <Button
               onClick={handleGeneratePriceList}
               variant="outline"
-              className="text-slate-700 border-slate-300 hover:bg-slate-100 bg-transparent"
+              size="sm"
+              className="text-slate-700 border-slate-300 hover:bg-slate-100 bg-transparent text-xs sm:text-sm px-2 sm:px-3"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Price List PDF
+              <Download className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Price List PDF</span>
             </Button>
             <Button
               onClick={handleDownloadPDF}
-              className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+              size="sm"
+              className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold shadow-md hover:shadow-lg transition-all text-xs sm:text-sm px-2 sm:px-3"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Quote PDF
+              <Download className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Quote PDF</span>
             </Button>
-            <Button onClick={handleLogout} variant="destructive" className="font-semibold shadow-md">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+            <Button onClick={handleLogout} variant="destructive" size="sm" className="font-semibold shadow-md text-xs sm:text-sm px-2 sm:px-3">
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 md:py-12">
         {showRateEditor === "materials" && (
-          <div className="mb-8 bg-white rounded-lg shadow-lg border border-slate-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">Update Material Rates</h2>
+          <div className="mb-6 md:mb-8 bg-white rounded-lg shadow-lg border border-slate-200 p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Update Material Rates</h2>
               <Button onClick={() => setShowRateEditor(null)} variant="ghost">
                 ✕
               </Button>
@@ -500,21 +497,21 @@ export default function Home() {
               {Object.entries(editableCoreData).map(([sizeKey, materials]) => (
                 <Card key={sizeKey} className="border-slate-200">
                   <CardHeader className="bg-gradient-to-r from-cyan-50 to-cyan-100 pb-3">
-                    <CardTitle className="text-base">
+                    <CardTitle className="text-base text-slate-900">
                       {sizeKey.substring(0, 2)}&quot; × {sizeKey.substring(2)}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-4 space-y-3">
+                  <CardContent className="pt-3 sm:pt-4 space-y-2 sm:space-y-3">
                     {Object.entries(materials).map(([material, rate]) => (
-                      <div key={material} className="flex items-center gap-3">
-                        <Label className="w-32 font-semibold text-slate-700">
+                      <div key={material} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <Label className="text-xs sm:text-sm sm:w-32 font-semibold text-slate-700">
                           {MATERIAL_NAMES[material as keyof typeof MATERIAL_NAMES] || material}
                         </Label>
                         <Input
                           type="number"
                           value={rate}
                           onChange={(e) => handleUpdateMaterialRate(sizeKey, material, e.target.value)}
-                          className="flex-1"
+                          className="flex-1 h-9 sm:h-10 text-sm"
                           step="0.01"
                         />
                       </div>
@@ -527,9 +524,9 @@ export default function Home() {
         )}
 
         {showRateEditor === "fabrics" && (
-          <div className="mb-8 bg-white rounded-lg shadow-lg border border-slate-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">Update Fabric Rates</h2>
+          <div className="mb-6 md:mb-8 bg-white rounded-lg shadow-lg border border-slate-200 p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Update Fabric Rates</h2>
               <Button onClick={() => setShowRateEditor(null)} variant="ghost">
                 ✕
               </Button>
@@ -621,28 +618,59 @@ export default function Home() {
         )}
 
         {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Mattress Price Calculator</h1>
-          <p className="text-base text-slate-600 max-w-2xl">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-1 sm:mb-2">Mattress Price Calculator</h1>
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl">
             Configure your mattress specifications and instantly calculate production costs, pricing, and retail MRP
           </p>
         </div>
 
         {/* System Features - Dashboard Overview */}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Price Summary Card - Shows first on mobile */}
+          <div className="lg:col-span-1 order-first lg:order-last">
+            <Card className="border-0 shadow-xl lg:sticky lg:top-24 bg-white overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-3 sm:pb-4 rounded-lg mx-3 sm:mx-[25px]">
+                <CardTitle className="text-lg sm:text-xl text-center">Price Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex justify-between items-baseline text-sm border-b border-slate-100 pb-2 sm:pb-3">
+                    <span className="text-slate-600 font-medium">Subtotal</span>
+                    <span className="font-semibold text-base sm:text-lg text-slate-900">
+                      ₹{calculation.subtotal.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-baseline text-sm border-b border-slate-100 pb-2 sm:pb-3">
+                    <span className="text-slate-600 font-medium">GST (18%)</span>
+                    <span className="font-semibold text-base sm:text-lg text-emerald-600">₹{calculation.gst.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline text-sm pb-2 sm:pb-3">
+                    <span className="text-slate-700 font-semibold">Cost Total</span>
+                    <span className="font-bold text-lg sm:text-xl text-cyan-600">₹{calculation.grandTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-3 sm:p-4 mt-3 sm:mt-4">
+                    <p className="text-xs text-red-700 font-bold uppercase tracking-wide mb-1">Retail MRP</p>
+                    <p className="text-2xl sm:text-3xl font-black text-red-600">₹{calculation.mrp.toLocaleString()}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Configuration Panel - Left Side */}
-          <div className="lg:col-span-2">
-            <div className="flex flex-col gap-6">
+          <div className="lg:col-span-2 order-last lg:order-first">
+            <div className="flex flex-col gap-4 sm:gap-6">
               <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-4 rounded-xl pt-0 mx-[21px]">
-                  <CardTitle className="text-xl text-center">Mattress Type</CardTitle>
+                <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-3 sm:pb-4 rounded-xl pt-0 mx-3 sm:mx-[21px]">
+                  <CardTitle className="text-lg sm:text-xl text-center">Mattress Type</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="flex gap-4">
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex gap-2 sm:gap-4">
                     <button
                       onClick={() => setMattressType("foam")}
-                      className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                      className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                         mattressType === "foam"
                           ? "bg-cyan-600 text-white shadow-md"
                           : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -652,7 +680,7 @@ export default function Home() {
                     </button>
                     <button
                       onClick={() => setMattressType("spring")}
-                      className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                      className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-semibold transition-all text-sm sm:text-base ${
                         mattressType === "spring"
                           ? "bg-cyan-600 text-white shadow-md"
                           : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -668,20 +696,20 @@ export default function Home() {
                 <>
                   {/* Basic Settings */}
                   <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-4 rounded-xl pt-0 mx-[25px]">
-                      <CardTitle className="text-xl text-center">Mattress Specifications</CardTitle>
-                      <CardDescription className="text-cyan-50 text-sm text-center">
+                    <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-3 sm:pb-4 rounded-xl pt-0 mx-3 sm:mx-[25px]">
+                      <CardTitle className="text-lg sm:text-xl text-center">Mattress Specifications</CardTitle>
+                      <CardDescription className="text-cyan-50 text-xs sm:text-sm text-center">
                         Select size and fabric type
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-2">
-                          <Label htmlFor="fabric" className="font-semibold text-slate-700">
+                    <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="fabric" className="font-semibold text-slate-700 text-sm">
                             Fabric Type
                           </Label>
                           <Select value={fabric} onValueChange={setFabric}>
-                            <SelectTrigger id="fabric" className="h-11 border-slate-200 focus:ring-cyan-500">
+                            <SelectTrigger id="fabric" className="h-10 sm:h-11 border-slate-200 focus:ring-cyan-500">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -690,12 +718,12 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="size" className="font-semibold text-slate-700">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="size" className="font-semibold text-slate-700 text-sm">
                             Mattress Size
                           </Label>
                           <Select value={size} onValueChange={setSize}>
-                            <SelectTrigger id="size" className="h-11 border-slate-200 focus:ring-cyan-500">
+                            <SelectTrigger id="size" className="h-10 sm:h-11 border-slate-200 focus:ring-cyan-500">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -713,18 +741,18 @@ export default function Home() {
 
                   {/* Material Configuration */}
                   <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-500 rounded-t-lg pb-4 mx-[25px] rounded-lg">
-                      <CardTitle className="text-xl text-center">Core Materials</CardTitle>
-                      <CardDescription className="text-teal-50 text-sm text-center">
+                    <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-500 rounded-t-lg pb-3 sm:pb-4 mx-3 sm:mx-[25px] rounded-lg">
+                      <CardTitle className="text-lg sm:text-xl text-center">Core Materials</CardTitle>
+                      <CardDescription className="text-teal-50 text-xs sm:text-sm text-center">
                         Specify thickness in inches for each material
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <CardContent className="pt-4 sm:pt-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                         {Object.keys(CORE_DATA[size as keyof typeof CORE_DATA]).map((mat) => (
-                          <div key={mat} className="space-y-2">
-                            <Label htmlFor={mat} className="font-semibold text-sm text-slate-700">
-                              {mat === "RB" && "Rubber Base"}
+                          <div key={mat} className="space-y-1.5 sm:space-y-2">
+                            <Label htmlFor={mat} className="font-semibold text-xs sm:text-sm text-slate-700">
+                              {mat === "RB" && "Rebound Foam"}
                               {mat === "PU" && "Polyurethane"}
                               {mat === "EP" && "(EP)"}
                               {mat === "LTX" && "Latex"}
@@ -738,7 +766,7 @@ export default function Home() {
                               max="10"
                               value={thicknesses[mat as keyof typeof thicknesses]}
                               onChange={(e) => handleThicknessChange(mat, e.target.value)}
-                              className="h-10 border-slate-200 focus:ring-teal-500"
+                              className="h-9 sm:h-10 border-slate-200 focus:ring-teal-500 text-sm"
                               placeholder="0"
                             />
                           </div>
@@ -751,18 +779,18 @@ export default function Home() {
                 <>
                   {/* Spring Configuration */}
                   <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-4">
-                      <CardTitle className="text-xl">Spring Configuration</CardTitle>
-                      <CardDescription className="text-cyan-50 text-sm">Configure spring and top layer</CardDescription>
+                    <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-3 sm:pb-4">
+                      <CardTitle className="text-lg sm:text-xl">Spring Configuration</CardTitle>
+                      <CardDescription className="text-cyan-50 text-xs sm:text-sm">Configure spring and top layer</CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="spring-type" className="font-semibold text-slate-700">
+                    <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="spring-type" className="font-semibold text-slate-700 text-sm">
                             Spring Type
                           </Label>
                           <Select value={springType} onValueChange={setSpringType}>
-                            <SelectTrigger id="spring-type" className="h-11 border-slate-200">
+                            <SelectTrigger id="spring-type" className="h-10 sm:h-11 border-slate-200">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -771,12 +799,12 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="spring-size" className="font-semibold text-slate-700">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="spring-size" className="font-semibold text-slate-700 text-sm">
                             Spring Size
                           </Label>
                           <Select value={springSize} onValueChange={setSpringSize}>
-                            <SelectTrigger id="spring-size" className="h-11 border-slate-200">
+                            <SelectTrigger id="spring-size" className="h-10 sm:h-11 border-slate-200">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -788,12 +816,12 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="fabric-spring" className="font-semibold text-slate-700">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="fabric-spring" className="font-semibold text-slate-700 text-sm">
                             Fabric Type
                           </Label>
                           <Select value={fabric} onValueChange={setFabric}>
-                            <SelectTrigger id="fabric-spring" className="h-11 border-slate-200">
+                            <SelectTrigger id="fabric-spring" className="h-10 sm:h-11 border-slate-200">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -808,24 +836,24 @@ export default function Home() {
 
                   {/* Top Layer Configuration */}
                   <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                    <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg pb-4">
-                      <CardTitle className="text-xl">Top Layer</CardTitle>
-                      <CardDescription className="text-teal-50 text-sm">
+                    <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg pb-3 sm:pb-4">
+                      <CardTitle className="text-lg sm:text-xl">Top Layer</CardTitle>
+                      <CardDescription className="text-teal-50 text-xs sm:text-sm">
                         Add optional top layer material
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="top-material" className="font-semibold text-slate-700">
+                    <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="top-material" className="font-semibold text-slate-700 text-sm">
                             Top Material
                           </Label>
                           <Select value={topMaterial} onValueChange={setTopMaterial}>
-                            <SelectTrigger id="top-material" className="h-11 border-slate-200">
+                            <SelectTrigger id="top-material" className="h-10 sm:h-11 border-slate-200">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="RB">Rubber Base</SelectItem>
+                              <SelectItem value="RB">Rebound Foam</SelectItem>
                               <SelectItem value="PU">Polyurethane</SelectItem>
                               <SelectItem value="EP">(EP)</SelectItem>
                               <SelectItem value="LTX">Latex</SelectItem>
@@ -834,8 +862,8 @@ export default function Home() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="top-thickness" className="font-semibold text-slate-700">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <Label htmlFor="top-thickness" className="font-semibold text-slate-700 text-sm">
                             Thickness (inches)
                           </Label>
                           <Input
@@ -846,7 +874,7 @@ export default function Home() {
                             step="0.5"
                             value={topThickness}
                             onChange={(e) => setTopThickness(e.target.value)}
-                            className="h-11 border-slate-200"
+                            className="h-10 sm:h-11 border-slate-200 text-sm"
                             placeholder="0"
                           />
                         </div>
@@ -857,62 +885,31 @@ export default function Home() {
               )}
             </div>
           </div>
-
-          {/* Price Summary Card - Right Side */}
-          <div className="lg:col-span-1">
-            <Card className="border-0 shadow-xl sticky top-24 bg-white overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-t-lg pb-4 rounded-lg mx-[25px]">
-                <CardTitle className="text-xl text-center">Price Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-baseline text-sm border-b border-slate-100 pb-3">
-                    <span className="text-slate-600 font-medium">Subtotal</span>
-                    <span className="font-semibold text-lg text-slate-900">
-                      ₹{calculation.subtotal.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-baseline text-sm border-b border-slate-100 pb-3">
-                    <span className="text-slate-600 font-medium">GST (18%)</span>
-                    <span className="font-semibold text-lg text-emerald-600">₹{calculation.gst.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-baseline text-sm pb-3">
-                    <span className="text-slate-700 font-semibold">Cost Total</span>
-                    <span className="font-bold text-xl text-cyan-600">₹{calculation.grandTotal.toLocaleString()}</span>
-                  </div>
-                  <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4 mt-4">
-                    <p className="text-xs text-red-700 font-bold uppercase tracking-wide mb-1">Retail MRP</p>
-                    <p className="text-3xl font-black text-red-600">₹{calculation.mrp.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Detailed Breakdown Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mt-6 sm:mt-8">
           {/* Core/Spring Materials */}
           <Card className="border-0 shadow-md hover:shadow-lg transition-shadow bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-teal-500 rounded-full"></span>
+            <CardHeader className="pb-2 sm:pb-3 border-b border-slate-100 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-base font-bold text-slate-700 flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-teal-500 rounded-full"></span>
                 {mattressType === "spring" ? "Spring Cost" : "Core Materials"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-2">
+            <CardContent className="pt-3 sm:pt-4 space-y-1.5 sm:space-y-2 px-3 sm:px-6">
               {mattressType === "spring" ? (
                 <>
-                  <div className="flex justify-between items-center py-1.5">
-                    <span className="text-slate-600 text-sm font-medium">{springType} Spring</span>
-                    <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold">
+                  <div className="flex justify-between items-center py-1 sm:py-1.5">
+                    <span className="text-slate-600 text-xs sm:text-sm font-medium">{springType} Spring</span>
+                    <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold text-xs">
                       ₹{calculation.type === "spring" && calculation.springCost.toLocaleString()}
                     </Badge>
                   </div>
                   {calculation.type === "spring" && calculation.topCost > 0 && (
-                    <div className="flex justify-between items-center py-1.5">
-                      <span className="text-slate-600 text-sm font-medium">{topMaterial} Top</span>
-                      <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold">
+                    <div className="flex justify-between items-center py-1 sm:py-1.5">
+                      <span className="text-slate-600 text-xs sm:text-sm font-medium">{topMaterial} Top</span>
+                      <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold text-xs">
                         ₹{calculation.topCost.toLocaleString()}
                       </Badge>
                     </div>
@@ -921,9 +918,9 @@ export default function Home() {
               ) : (
                 calculation.type === "foam" &&
                 Object.entries(calculation.coreCosts).map(([mat, cost]) => (
-                  <div key={mat} className="flex justify-between items-center py-1.5">
-                    <span className="text-slate-600 text-sm font-medium">{mat}</span>
-                    <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold">
+                  <div key={mat} className="flex justify-between items-center py-1 sm:py-1.5">
+                    <span className="text-slate-600 text-xs sm:text-sm font-medium">{mat}</span>
+                    <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-semibold text-xs">
                       ₹{cost.toLocaleString()}
                     </Badge>
                   </div>
@@ -934,33 +931,33 @@ export default function Home() {
 
           {/* Fabric Details */}
           <Card className="border-0 shadow-md hover:shadow-lg transition-shadow bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
+            <CardHeader className="pb-2 sm:pb-3 border-b border-slate-100 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-base font-bold text-slate-700 flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-500 rounded-full"></span>
                 Fabric Cost
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-2">
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Top Fabric</span>
-                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold">
+            <CardContent className="pt-3 sm:pt-4 space-y-1.5 sm:space-y-2 px-3 sm:px-6">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Top</span>
+                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold text-xs">
                   ₹{calculation.topPrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Bottom Fabric</span>
-                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Bottom</span>
+                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold text-xs">
                   ₹{calculation.bottomPrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Side Binding</span>
-                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Side</span>
+                <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 font-semibold text-xs">
                   ₹{calculation.sidePrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="border-t border-slate-100 pt-2 mt-2 font-semibold text-slate-900 flex justify-between">
-                <span>Subtotal</span>
+              <div className="border-t border-slate-100 pt-1.5 sm:pt-2 mt-1.5 sm:mt-2 font-semibold text-slate-900 flex justify-between text-xs sm:text-sm">
+                <span>Total</span>
                 <span className="text-cyan-600 font-bold">₹{calculation.fabricTotal.toLocaleString()}</span>
               </div>
             </CardContent>
@@ -968,34 +965,35 @@ export default function Home() {
 
           {/* Additional Charges */}
           <Card className="border-0 shadow-md hover:shadow-lg transition-shadow bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                Additional Charges
+            <CardHeader className="pb-2 sm:pb-3 border-b border-slate-100 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-base font-bold text-slate-700 flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-500 rounded-full"></span>
+                <span className="hidden sm:inline">Additional Charges</span>
+                <span className="sm:hidden">Extras</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-2">
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Packing</span>
-                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold">
+            <CardContent className="pt-3 sm:pt-4 space-y-1.5 sm:space-y-2 px-3 sm:px-6">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Packing</span>
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold text-xs">
                   ₹{calculation.packingPrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Gum & Beeding</span>
-                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Gum</span>
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold text-xs">
                   ₹{calculation.gumBeedPrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center py-1.5">
-                <span className="text-slate-600 text-sm font-medium">Labour</span>
-                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold">
+              <div className="flex justify-between items-center py-1 sm:py-1.5">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Labour</span>
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold text-xs">
                   ₹{calculation.labourPrice.toLocaleString()}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center py-1.5 border-t border-slate-100 pt-2">
-                <span className="text-slate-600 text-sm font-medium">Margin</span>
-                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold">
+              <div className="flex justify-between items-center py-1 sm:py-1.5 border-t border-slate-100 pt-1.5 sm:pt-2">
+                <span className="text-slate-600 text-xs sm:text-sm font-medium">Margin</span>
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 font-semibold text-xs">
                   ₹{calculation.margin.toLocaleString()}
                 </Badge>
               </div>
@@ -1004,45 +1002,45 @@ export default function Home() {
 
           {/* Configuration Summary */}
           <Card className="border-0 shadow-md hover:shadow-lg transition-shadow bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-slate-500 rounded-full"></span>
+            <CardHeader className="pb-2 sm:pb-3 border-b border-slate-100 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-base font-bold text-slate-700 flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-slate-500 rounded-full"></span>
                 Configuration
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-4">
+            <CardContent className="pt-3 sm:pt-4 space-y-2 sm:space-y-4 px-3 sm:px-6">
               {mattressType === "foam" ? (
                 <>
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Dimensions</p>
-                    <p className="text-lg font-bold text-slate-900">
+                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5 sm:mb-1">Dimensions</p>
+                    <p className="text-sm sm:text-lg font-bold text-slate-900">
                       {size.substring(0, 2)}&quot; × {size.substring(2, 4)}
                     </p>
                   </div>
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Total Height</p>
-                    <p className="text-lg font-bold text-slate-900">
+                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5 sm:mb-1">Total Height</p>
+                    <p className="text-sm sm:text-lg font-bold text-slate-900">
                       {calculation.type === "foam" ? calculation.mattressThickness : 0} inches
                     </p>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Spring Size</p>
-                    <p className="text-lg font-bold text-slate-900">{springSize}</p>
+                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5 sm:mb-1">Spring Size</p>
+                    <p className="text-sm sm:text-lg font-bold text-slate-900">{springSize}</p>
                   </div>
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Total Height</p>
-                    <p className="text-lg font-bold text-slate-900">
+                  <div className="bg-slate-50 rounded-lg p-2 sm:p-3">
+                    <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5 sm:mb-1">Total Height</p>
+                    <p className="text-sm sm:text-lg font-bold text-slate-900">
                       {calculation.type === "spring" ? calculation.finalHeight.toFixed(1) : 0} inches
                     </p>
                   </div>
                 </>
               )}
-              <div className="bg-slate-50 rounded-lg p-3">
-                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Fabric Type</p>
-                <p className="text-lg font-bold capitalize text-slate-900">{fabric}</p>
+              <div className="bg-slate-50 rounded-lg p-2 sm:p-3">
+                <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5 sm:mb-1">Fabric Type</p>
+                <p className="text-sm sm:text-lg font-bold capitalize text-slate-900">{fabric}</p>
               </div>
             </CardContent>
           </Card>

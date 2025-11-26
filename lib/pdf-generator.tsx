@@ -10,6 +10,20 @@ interface GeneratePDFParams {
   topThickness?: string
 }
 
+// Detect if running on iOS
+const isIOS = () => {
+  if (typeof navigator === "undefined") return false
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
+// Detect if running on mobile
+const isMobile = () => {
+  if (typeof navigator === "undefined") return false
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
 export const generatePDF = async (params: GeneratePDFParams) => {
   const { mattressType, fabric, size, calculation, springType, springSize, topMaterial, topThickness } = params
 
@@ -163,11 +177,79 @@ export const generatePDF = async (params: GeneratePDFParams) => {
   const opt = {
     margin: 0,
     filename: `Feza_Quotation_${Date.now()}.pdf`,
-    image: { type: "jpeg", quality: 0.98 },
+    image: { type: "jpeg" as const, quality: 0.98 },
     html2canvas: { scale: 2, logging: false, useCORS: true },
-    jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+    jsPDF: { orientation: "portrait" as const, unit: "mm" as const, format: "a4" as const },
   }
 
   const html2pdf = (await import("html2pdf.js")).default
-  html2pdf().set(opt).from(element).save()
+  
+  // For iOS and mobile devices, we need to handle the PDF differently
+  if (isIOS() || isMobile()) {
+    // Generate PDF as blob and open in new tab
+    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob')
+    const blobUrl = URL.createObjectURL(pdfBlob)
+    
+    // Create a temporary link and trigger download
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = opt.filename
+    link.target = '_blank'
+    
+    // For iOS Safari, we need to open in new window
+    if (isIOS()) {
+      window.open(blobUrl, '_blank')
+    } else {
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+    
+    // Clean up blob URL after a delay
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000)
+  } else {
+    // Desktop browsers can use the standard save method
+    html2pdf().set(opt).from(element).save()
+  }
+}
+
+// Export helper for price list PDF generation
+export const generatePriceListPDF = async (element: HTMLElement, filename: string) => {
+  const opt = {
+    margin: [10, 10, 10, 10] as [number, number, number, number],
+    filename,
+    image: { type: "jpeg" as const, quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { orientation: "landscape" as const, unit: "mm" as const, format: "a4" as const },
+  }
+
+  const html2pdf = (await import("html2pdf.js")).default
+  
+  // For iOS and mobile devices, we need to handle the PDF differently
+  if (isIOS() || isMobile()) {
+    // Generate PDF as blob and open in new tab
+    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob')
+    const blobUrl = URL.createObjectURL(pdfBlob)
+    
+    // Create a temporary link and trigger download
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = filename
+    link.target = '_blank'
+    
+    // For iOS Safari, we need to open in new window
+    if (isIOS()) {
+      window.open(blobUrl, '_blank')
+    } else {
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+    
+    // Clean up blob URL after a delay
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000)
+  } else {
+    // Desktop browsers can use the standard save method
+    html2pdf().set(opt).from(element).save()
+  }
 }
