@@ -1,5 +1,3 @@
-import html2pdf from "html2pdf.js"
-
 interface GeneratePDFParams {
   mattressType: "foam" | "spring"
   fabric: string
@@ -170,5 +168,6 @@ export const generatePDF = async (params: GeneratePDFParams) => {
     jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
   }
 
+  const html2pdf = (await import("html2pdf.js")).default
   html2pdf().set(opt).from(element).save()
 }
